@@ -10,10 +10,10 @@
 4. **Resolve** the address of `LoadLibraryW` in `kernel32.dll` - `GetProcAddress`
 5. **Execute** it in the target with the DLL path as its argument - `CreateRemoteThread`
 
-`kernel32.dll` is mapped at the same address across processes in a session, so the `LoadLibraryW` address resolved locally is valid in the target - that's why step 4 works.
+`kernel32.dll` is mapped at the same address in a boot session, so the `LoadLibraryW` address resolved locally is valid in the target - that's why step 4 works.
 
 ## Build & run
-Opens a *Developer Command Prompt for Visual Studio*, then build both parts:
+Open a *Developer Command Prompt for Visual Studio*, then build both parts:
 
 ```console
 cl /LD payload.c user32.lib
@@ -40,11 +40,11 @@ This technique is easy to detect, because every step is visible to the OS:
 - `VirtualAllocEx` used on another process. My injector only needs `PAGE_READWRITE` here, because the bytes I write are just a DLL path, not code to execute
 - The target process suddenly loads a DLL from an unusual folder, which security tools can see as a module-load event
 
-## Limitation
+## Limitations
 - **The DLL must exist on disk.** `LoadLibraryW` only takes a file path, so antivirus gets a file to scan and a clear artifact is left behind.
 - **Only a one-argument function can be started.** `CreateRemoteThread` passes a single value to the thread start routine, which is why `LoadLibraryW` is the classic choice here.
 
 Shellcode injection removes both. See the write-up for the full reasoning.
 
 ## Write-up
-Full walkthrough with internals and screenshots:
+Full walkthrough with internals and screenshots: [https://gloamraven.github.io/posts/dllinjection/](https://gloamraven.github.io/posts/dllinjection/)
