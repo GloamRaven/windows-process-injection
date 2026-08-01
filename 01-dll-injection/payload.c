@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : DLL 애플리케이션의 진입점을 정의합니다.
+﻿
 #include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -9,7 +9,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        MessageBox(NULL, L"Caw! Caw!", L"GloamRaven", MB_OK | MB_ICONWARNING);
+        MessageBoxW(NULL, L"Caw! Caw!", L"GloamRaven", MB_OK | MB_ICONWARNING);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
