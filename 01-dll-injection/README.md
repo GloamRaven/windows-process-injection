@@ -13,12 +13,13 @@
 `kernel32.dll` is mapped at the same address in a boot session, so the `LoadLibraryW` address resolved locally is valid in the target - that's why step 4 works.
 
 ## Build & run
-Open a *Developer Command Prompt for Visual Studio*, then build both parts:
+Open an *x64 Native Tools Command Prompt* (any Visual Studio version), then build both parts:
 
 ```console
 cl /LD payload.c user32.lib
 cl injector.c
 ```
+The injector, the payload DLL and the target process must all be 64-bit. A 32-bit build resolves `LoadLibraryW` from `SysWOW64` and the address will not be valid in a 64-bit target.
 
 Run the injector. It prompts for the name of the target process and the absolute path of the DLL to inject:
 
