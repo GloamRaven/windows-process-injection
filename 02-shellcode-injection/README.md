@@ -31,7 +31,10 @@ cl extractor.c shell.obj
 extractor.exe > shellcode.h
 cl injector.c
 ```
-`sc.asm` is the source of truth. `shellcode.h` is generated - do not edit it by hand.
+
+Or run `build.bat`, which does the same four steps and stops on the first failure.
+
+`sc.asm` is the source of truth. `shellcode.h` is generated - do not edit it by hand, and re-run the full build after any change to `sc.asm`.
 
 Run the injector. It prompts for the name of the target process:
 
@@ -61,4 +64,4 @@ Some of the signals from DLL injection are gone, and new one appears:
 APC injection removes the last one: instead of creating a thread that begins at the payload, it queues the payload onto a thread the target already owns. See the write-up for the full reasoning.
 
 ## Write-up
-Full walkthrough with internals and screenshots: [https://gloamraven.github.io/posts/dllinjection/](https://gloamraven.github.io/posts/shellcodeinjection/)
+Full walkthrough with internals and screenshots: [https://gloamraven.github.io/posts/shellcodeinjection/](https://gloamraven.github.io/posts/shellcodeinjection/)

@@ -4,7 +4,7 @@ Implementations of Windows process injection techniques in C, each with a write-
 | # | Technique | MITRE | Status |
 |---|-----------|-------|----------|
 | 01 | [Classic DLL Injection](01-dll-injection/) | T1055.001 | ✅ [Blog](https://gloamraven.github.io/posts/dllinjection/) |
-| 02 | Shellcode Injection | T1055 | ✅ [Blog](https://gloamraven.github.io/posts/shellcodeinjection/) |
+| 02 | [Shellcode Injection](02-shellcode-injection/) | T1055 | ✅ [Blog](https://gloamraven.github.io/posts/shellcodeinjection/) |
 | 03 | APC Injection | T1055.004 | 🚧 |
 
 Built and tested on Windows 10 x64.
