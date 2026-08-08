@@ -22,7 +22,7 @@ loop_ent:
 	mov eax, dword ptr [rsi]		; name RVA
 	add rsi, 4
 
-	push rax						; 해시 계산이 망치는 것만 저장
+	push rax						; Save only the registers modified during hash calculation
 	push rbx
 	push rsi
 	push rdi
@@ -37,9 +37,9 @@ hash:
 	add rdi, rax
 	test al, al
 	jnz hash
-	mov qword ptr [rbp + 10h], rdi	; 계산된 해시를 스크래치에 보관
+	mov qword ptr [rbp + 10h], rdi	; Store the calculated hash in the scratch space
 
-	pop rdi							; rdi = 목표 해시로 복원
+	pop rdi							; Restore the target hash to RDI
 	pop rsi
 	pop rbx
 	pop rax
@@ -47,7 +47,7 @@ hash:
 	cmp [rbp + 10h], rdi
 	jne loop_ent
 
-	;찾음. 이름 인덱스는 rdx-1
+	; Found: name index = RDX - 1
 	movzx rdx, word ptr [rcx + rdx * 2 - 2]	; ordinal
 	mov rdi, [rbp + 18h]
 	xor rsi, rsi
@@ -69,44 +69,44 @@ start:
 	push rbx
 	push rsi
 	push rdi
-	mov rax, rsp							; 원래 rsp 보관
-	sub rsp, 70h							; 스크래치 블록
-	and rsp, 0FFFFFFFFFFFFFFF0h				; 16바이트 정렬
-	mov rbp, rsp							; rbp = 스크래치 베이스
-	sub rsp, 40h							; 쉐도우 스페이스, 이후 모든 call이 공유
-	mov [rbp+8], rax						; 원래 rsp 저장
+	mov rax, rsp							; Save the original RSP
+	sub rsp, 70h							; Scratch space
+	and rsp, 0FFFFFFFFFFFFFFF0h				; Align the stack to a 16-byte boundary
+	mov rbp, rsp							; RBP = scratch base
+	sub rsp, 40h							; Shadow space shared by all subsequent calls
+	mov [rbp+8], rax						; Save the original RSP
 
 	xor rax, rax
 	xor rdi, rdi
 	xor rsi, rsi
 	xor rcx, rcx
-	mov rax, gs : [rax+60h] ; peb
-	mov rax, [rax + 18h] ; peb_ldr_data
-	mov rax, [rax + 10h] ; .exe inloadordermodulelist
-	mov rbx, [rax] ; ntdll.dll inloadordermodulelist
-	mov rbx, [rbx] ; kernel32.dll inloadordermodulelist
-	mov rbx, [rbx + 30h] ; kernel32.dll base adr
+	mov rax, gs : [rax+60h]					; peb
+	mov rax, [rax + 18h]					; peb_ldr_data
+	mov rax, [rax + 10h]					; .exe inloadordermodulelist
+	mov rbx, [rax]							; ntdll.dll inloadordermodulelist
+	mov rbx, [rbx]							; kernel32.dll inloadordermodulelist
+	mov rbx, [rbx + 30h]					; kernel32.dll base adr
 
-	mov edi, dword ptr [rbx + 3ch] ; pe header
+	mov edi, dword ptr [rbx + 3ch]			; pe header
 	add rdi, rbx
 	xor r8, r8
 	add r8, rdi
 	add r8, 40h
-	mov edi, dword ptr [r8 + 48h]	; Export Table
+	mov edi, dword ptr [r8 + 48h]			; Export Table
 	add rdi, rbx
 	mov [rbp + 18h], rdi
-	mov esi, dword ptr [rdi + 20h]	; Export name Table
+	mov esi, dword ptr [rdi + 20h]			; Export name Table
 	add rsi, rbx
-	mov ecx, dword ptr [rdi + 24h]	; Ordinal Table
+	mov ecx, dword ptr [rdi + 24h]			; Ordinal Table
 	add rcx, rbx
 	xor rdx, rdx
 
 	xor rdi, rdi
 	add di, 496h
-	call get_func_addr				; get loadlibrary address
+	call get_func_addr						; get loadlibrary address
 	test rax, rax
 	jz error
-	mov [rbp + 48h], rax			; loadlibrary address
+	mov [rbp + 48h], rax					; loadlibrary address
 
 	xor rax, rax
 	mov qword ptr[rbp+20h], rax
@@ -126,11 +126,11 @@ start:
 	test rax, rax
 	jz error
 
-	; user32.dll의 EAT, ENT, Ordinal Table 주소 구하기
+	; Get the addresses of the EAT, ENT, and Ordinal Table in user32.dll
 	xor rdi, rdi
 	xor rsi, rsi
 	xor rcx, rcx
-	mov rbx, rax	; rax는 user32.dll base adr
+	mov rbx, rax							; RAX contains the base address of user32.dll
 	mov edi, dword ptr [rbx + 3ch]
 	add rdi, rbx
 	xor r8, r8
