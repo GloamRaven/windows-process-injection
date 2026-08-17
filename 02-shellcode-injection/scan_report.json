@@ -1,0 +1,68 @@
+ {
+  "pid" : 9720,
+  "is_64_bit" : 1,
+  "is_managed" : 0,
+  "main_image_path" : "C:\\Windows\\System32\\notepad.exe",
+  "used_reflection" : 0,
+  "scanner_version" : "0.4.1.1",
+  "scanned" : 
+  {
+   "total" : 51,
+   "skipped" : 0,
+   "modified" : 
+   {
+    "total" : 2,
+    "patched" : 0,
+    "iat_hooked" : 0,
+    "replaced" : 0,
+    "hdr_modified" : 0,
+    "implanted_pe" : 0,
+    "implanted_shc" : 2,
+    "unreachable_file" : 0,
+    "other" : 0
+   },
+   "errors" : 0
+  },
+  "scans" : [
+   {
+    "workingset_scan" : {
+     "status" : 1,
+     "module" : "1853a830000",
+     "module_size" : "1000",
+     "has_pe" : 0,
+     "has_shellcode" : 1,
+     "is_listed_module" : 0,
+     "protection" : "20",
+     "mapping_type" : "MEM_PRIVATE",
+     "patterns" : {
+      "total_matched" : 1
+     }
+    }
+   },
+   {
+    "thread_scan" : {
+     "status" : 1,
+     "thread_id" : 4036,
+     "thread_info" : {
+      "state" : "Waiting",
+      "wait_reason" : "WrUserRequest",
+      "callstack" : {
+       "stack_ptr" : "f52cff378",
+       "frames_count" : 11,
+       "frames" : ["7ffe09e2d2f8;kernel32.dll!QuirkIsEnabledForPackage2Worker+0x2a938", "20830;", "1853a8301e9;+0x1e9", "7ffe0945c12e;user32.dll!MessageBoxA+0x4e", "7ffe0945c518;user32.dll!MessageBoxTimeoutA+0x108", "7ffe0945c727;user32.dll!MessageBoxTimeoutW+0x1a7", "7ffe0945b935;user32.dll!DrawStateA+0x1e25", "7ffe0945d01b;user32.dll!SoftModalMessageBox+0x85b", "7ffe0940e0b1;user32.dll!DialogBoxIndirectParamAorW+0x1a1", "7ffe0940e341;user32.dll!DialogBoxIndirectParamAorW+0x431", "7ffe07b211c4;win32u.dll!NtUserWaitMessage+0x14"]
+      }
+     },
+     "indicators" : ["SUS_START", "SUS_CALLSTACK_SHC"],
+     "susp_addr" : "1853a8301e9",
+     "module" : "1853a830000",
+     "module_size" : "1000",
+     "protection" : "4",
+     "stats" : {
+      "area_start" : "0",
+      "area_size" : "3ee",
+      "entropy" : 5.69829
+     }
+    }
+   }
+  ]
+ }
